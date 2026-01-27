@@ -1,24 +1,20 @@
 package com.astememe.minecraft_objects_api;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolder> {
 
@@ -37,6 +33,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return new RecyclerViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerViewHolder holder, int position) {
         McItemInfo mcItemInfo = mcItemInfoArrayList.get(position);
@@ -46,7 +43,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 .load(mcItemInfo.getImagen())
                 .centerCrop()
                 .into(holder.imagenIV);
+    }
 
+    public void filtrar(ArrayList<McItemInfo> mcItemInfoArrayListFiltrada) {
+        this.mcItemInfoArrayList = mcItemInfoArrayListFiltrada;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -59,19 +60,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private TextView tituloTV;
         private TextView descripcionTV;
         private ImageView imagenIV;
+        private CardView tarjeta;
 
         private RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
+            tarjeta = itemView.findViewById(R.id.tarjeta);
             tituloTV = itemView.findViewById(R.id.titulo);
             descripcionTV = itemView.findViewById(R.id.descripcion);
             imagenIV = itemView.findViewById(R.id.imagen);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(context, tituloTV.getText().toString(), Toast.LENGTH_LONG).show();
-                }
-            });
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.astememe.minecraft_objects_api;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
@@ -10,6 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,9 +25,12 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     public ArrayList<McItemInfo> mcItemInfoArrayList = new ArrayList<>();
     RecyclerView recyclerView;
+    TextInputEditText busqueda;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        fillItems();
 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -33,9 +40,21 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         recyclerView = findViewById(R.id.lista);
-        fillItems();
-
+        busqueda = findViewById(R.id.busqueda);
     }
+
+    private void filtrarTexto(String texto, RecyclerViewAdapter adapter) {
+        ArrayList<McItemInfo> filtrados = new ArrayList<>();
+
+        for (McItemInfo item : mcItemInfoArrayList) {
+            if (item.getTitulo().toLowerCase().contains(texto.toLowerCase())) {
+                filtrados.add(item);
+            }
+        }
+
+        adapter.filtrar(filtrados);
+    }
+
 
     public void fillItems() {
         ApiInterface appInterface = APIClient.getRetrofitInstance().create(ApiInterface.class);
@@ -43,8 +62,6 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<McItemAPIResponse>>() {
             @Override
             public void onResponse(Call<List<McItemAPIResponse>> call, Response<List<McItemAPIResponse>> response) {
-//                ChannelSearchEnum[] enums = gson.fromJson(yourJson, ChannelSearchEnum[].class);
-//                https://stackoverflow.com/questions/9598707/gson-throwing-expected-begin-object-but-was-begin-array
                 String nombre = "";
                 String descripcion = "";
                 String enlace = "";
@@ -62,6 +79,23 @@ public class MainActivity extends AppCompatActivity {
 
                 recyclerView.setLayoutManager(layoutManager);
                 recyclerView.setAdapter(adapter);
+
+
+                //https://www.simplifiedcoding.net/search-functionality-recyclerview/
+                busqueda.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        filtrarTexto(s.toString(), adapter);
+                    }
+                });
+
+
 
             }
 
